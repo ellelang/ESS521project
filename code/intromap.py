@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 plt.style.use('bmh')
 from pathlib import Path
-data_folder = Path('D:/OneDrive/AAMOSM2018/0828mapdata')
+data_folder = Path('D:/UWonedrive/OneDrive - UW/AAMOSM2018/0828mapdata')
 from shapely.geometry import Point, Polygon
 from matplotlib.lines import Line2D
 import pandas as pd
@@ -34,11 +34,12 @@ for idx, row in subbasin.iterrows():
 subbasin.plot(ax = ax, column = 'watershed', linewidth=0.8, cmap='summer_r',edgecolor='#B3B3B3', legend = True)
 stream.plot(ax = ax, edgecolor='blue')
 gage.plot(ax = ax, marker='*', color='red', markersize=400)
+wcmo.plot(ax = ax, color = 'darkorchid', edgecolor = 'darkorchid')
 
 #wcmo.plot(ax = ax, edgecolor = 'darkorchid')
 ax.grid(False)
 ax.axis('off')
-
+plt.savefig('shorpre.png', bbox_inches='tight', dpi=200)
 #######################
 cmap1 = plt.cm.summer_r
 cmap2 = plt.cm.Paired

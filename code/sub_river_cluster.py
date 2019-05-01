@@ -45,13 +45,17 @@ nLES
 nMAP
 nCOB
 
+
+
+
+
 def Hyd_sub (data, sub_col, sid, river_id):
     wcmo_hydsub = data[data[sub_col] == sid] 
     globals()['n%s%d' % (river_id,sid)] =  wcmo_hydsub.shape[0]
     if wcmo_hydsub.shape[0] > 0:
         globals()['wcmo_%s_sub%d' % (river_id,sid)] = wcmo_hydsub
-        filename = 'wcmo_' + river_id + '_sub' + str(sid) + '.csv'
-        wcmo_hydsub.to_csv(filename, index = False)
+        #filename = 'wcmo_' + river_id + '_sub' + str(sid) + '.csv'
+        #wcmo_hydsub.to_csv(filename, index = False)
     
 for sid in subid:
     Hyd_sub (wcmo_LES, 'HYDSB_LES30SB', sid, 'LES')
