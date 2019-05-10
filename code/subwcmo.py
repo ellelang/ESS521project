@@ -7,7 +7,7 @@ import seaborn as sns
 plt.style.use('bmh')
 wcmodata_mapsub29 = pd.read_csv(data_folder/'output/wcmo_MAP_sub29.csv')
 wcmodata_mapsub29.shape
-near_wld = wcmodata_mapsub29[['Site_ID','SedRed','NEAR_FID', 'NEAR_DIST','area_m2']].sort_values(by=['NEAR_FID','SedRed'])
+near_wld = wcmodata_mapsub29[['Site_ID','SedRed','Cost','NEAR_FID', 'NEAR_DIST','area_m2']].sort_values(by=['NEAR_FID','SedRed'])
 near_wld
 near_wld.to_csv(data_folder/'output/nearcluster_MAP_sub29.csv', index = False)
 near_wld
