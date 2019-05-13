@@ -8,6 +8,7 @@ from deap import base
 from deap import creator
 from deap import tools
 from deap import algorithms
+import json
 import matplotlib.pyplot as plt
 
 maple29data = pd.read_csv(data_folder/'output/prep2_MAP_sub29.csv')
@@ -20,7 +21,7 @@ cost = maple29data.Cost
 clusts = maple29data.NEAR_FID
 clusterids = list(maple29data.NEAR_FID.unique())
 clusterids
-
+sed
 [value == 113 for value in clusts]
 
 maple29data.groupby("NEAR_FID")["SedRed"]
@@ -44,7 +45,14 @@ items
 cluster_items = pd.DataFrame( [item for item in items.values() if item[2] == 13690])
 cluster_items
 
-    
+def initIndividual(icls, content):
+    return icls(content)
+
+
+def initPopulation(pcls, ind_init, filename):
+    with open(filename, "r") as pop_file:
+        contents = json.load(pop_file)
+    return pcls(ind_init(c) for c in contents)
 
 
 
@@ -57,6 +65,9 @@ toolbox = base.Toolbox()
 toolbox.register("attr_item", random.randrange, NBR_ITEMS)
 toolbox.register("individual", tools.initRepeat, creator.Individual, 
     toolbox.attr_item, IND_INIT_SIZE)
+
+toolbox.register("individual_guess", initIndividual, creator.Individual)
+toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, data_folder/"bcrseeds.json")
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
@@ -95,6 +106,10 @@ def mutSet(individual):
         individual.add(random.randrange(NBR_ITEMS))
     return individual,
 
+
+
+
+
 toolbox.register("evaluate", evalKnapsack)
 toolbox.register("mate", cxSet)
 toolbox.register("mutate", mutSet)
@@ -102,13 +117,14 @@ toolbox.register("select", tools.selNSGA2)
 
 
 def main():
-    NGEN = 50
+    NGEN = 5000
     MU = 50
     LAMBDA = 100
     CXPB = 0.7
     MUTPB = 0.2
-    
-    pop = toolbox.population(n=MU)
+    #seeding!!
+    #pop = toolbox.population(n=MU)
+    pop = toolbox.population_guess()
     #hof = tools.ParetoFront()
     logbook = tools.Logbook()
     logbook.header = "gen", "evals", "std", "min", "avg", "max"
@@ -137,5 +153,7 @@ pop_results
 
 cost_f = front[:,0]
 sed_f = front[:,1]
-
+max(sed_f)
 plt.scatter(sed_f, cost_f)
+
+

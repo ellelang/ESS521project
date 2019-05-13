@@ -1,0 +1,6 @@
+
+Gurobi 8.1.0 (win64, Python) logging started 05/13/19 13:11:27
+
+Academic license - for non-commercial use only
+Changed value of parameter PoolSolutions to 100
+   Prev: 10  Min: 1  Max: 2000000000  Default: 10

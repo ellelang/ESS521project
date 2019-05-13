@@ -21,6 +21,7 @@ near_wld['Cluster_size']
 
 near_wld["Sedrank"] = near_wld.groupby("NEAR_FID")["SedRed"].rank("dense", ascending=False)
 near_wld["Sedrank"]
+near_wld["bcr"] = near_wld["SedRed"]/near_wld['Cost']
 near_wld.to_csv(data_folder/'output/prep2_MAP_sub29.csv', index = False)
 near_wld['NEAR_FID'].astype('category')
 
