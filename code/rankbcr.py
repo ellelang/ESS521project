@@ -90,9 +90,15 @@ json.dump(seeds_array_epis_to_list, open(data_folder/json_file, 'w', encoding='u
 
 plt.scatter(sedsum, costsum, c='b', marker='x', label='bcr_ranking')
 plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_epistasis')
-plt.scatter(sed_f, cost_f, c='r', marker='s', label='EA_epistasis')
+plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
+plt.scatter(sed_f, cost_f, c='r', marker='s', label='EA_bcrseed')
 plt.legend(loc='upper left')
+plt.xlabel('Sed_Reduction')
+plt.ylabel('Cost')
+plt.savefig('paretofront_compare.png',dpi = 100)
 plt.show()
+
+
 
 plt.scatter(sedsum, costsum)
 

@@ -117,13 +117,14 @@ toolbox.register("select", tools.selNSGA2)
 
 
 def main():
-    NGEN = 5000
+    NGEN = 10000
     MU = 50
     LAMBDA = 100
     CXPB = 0.7
     MUTPB = 0.2
-    #seeding!!
+    #no seeding
     #pop = toolbox.population(n=MU)
+    #seeding!!
     pop = toolbox.population_guess()
     #hof = tools.ParetoFront()
     logbook = tools.Logbook()
@@ -143,7 +144,20 @@ def main():
 if __name__ == "__main__":
     results = main()
 
+#############no seeding
+noseedfront = results[1]
+noseedpop_results = results[0]
+noseedpop_results.sort(key=lambda x: x.fitness.values)
+noseedpop_results[0]
+noseedpop_results[-1]
+noseedpop_results
 
+noseedcost_f = noseedfront[:,0]
+noseedsed_f = noseedfront[:,1]
+max(noseedsed_f)
+
+##############bcr seeding
+    
 front = results[1]
 pop_results = results[0]
 pop_results.sort(key=lambda x: x.fitness.values)
@@ -153,7 +167,12 @@ pop_results
 
 cost_f = front[:,0]
 sed_f = front[:,1]
-max(sed_f)
+
+
+
+
+plt.scatter(noseedsed_f, noseedcost_f)
 plt.scatter(sed_f, cost_f)
+
 
 
