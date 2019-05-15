@@ -53,9 +53,47 @@ plt.grid(None)
 plt.savefig('maple29_Inertia.png',dpi = 300,bbox_inches='tight')
 
 
+######
+mapledata = pd.read_csv(data_folder/'output/wcmo_MAP.csv')
+maplekeys = mapledata[['SedRed','Cost','Duck']]
+clusterids = list(mapledata.NEAR_FID.unique())
+len(clusterids)
+
+mapleinertiatest = []
+maplencluster = list(range(50,547,50))
+maplencluster
+
+for c in maplencluster:
+    model = KMeans(n_clusters= c)
+    modelc = model.fit(maplekeys)
+    mapleinertiatest.append(modelc.inertia_)
+
+plt.plot(maplencluster, mapleinertiatest,'.-')
+plt.xlabel('Clusters')
+plt.ylabel('Inertia')
+plt.grid(None)
+plt.savefig('maplecluster_Inertia.png',dpi = 300,bbox_inches='tight')
 
 
 
+
+
+wcmodata = pd.read_csv(data_folder/'output/wcmogawhole.csv')
+wcmokeys = wcmodata[['SedRed','Cost','Duck']]
+wcmoinertiatest = []
+wcmoncluster = list(range(200,1935,100))
+wcmoncluster
+wcmoinertiatest
+for c in wcmoncluster:
+    model = KMeans(n_clusters= c)
+    modelc = model.fit(wcmokeys)
+    wcmoinertiatest.append(modelc.inertia_)
+
+plt.plot(wcmoinertiatest,'.-')
+plt.xlabel('Clusters')
+plt.ylabel('Inertia')
+plt.grid(None)
+plt.savefig('wcmocluster_Inertia.png',dpi = 300,bbox_inches='tight')
 
 model1 = model.fit(map29keys)
 model1.inertia_
