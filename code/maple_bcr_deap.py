@@ -54,9 +54,7 @@ near_wld_maple.to_csv(data_folder/'output/bcr_ranking_MAP.csv', index = False)
 sed = near_wld_maple['SedRed']
 cost = near_wld_maple['Cost']
 
-sedsum = [sum(sed * near_wld_maple[i]) for i in topname]
 
-costsum = [sum(cost * near_wld_maple[i]) for i in topname]
 
 seeds_array = np.array(near_wld_maple[topname])
 seeds_array
@@ -72,25 +70,37 @@ for i in range (len(top)):
     near_wld_maple[topname_epis[i]] = [0]* NBR_ITEMS
     
 bcr_epis = [None]*NBR_ITEMS
+sed_epis = [None]*NBR_ITEMS
+
 for i in range(NBR_ITEMS):
     topn = int(np.ceil(cluster_size[i]/2))
     if sedrank[i] > topn:
         bcr_epis[i] = 0
+        sed_epis[i] = 0
     else:
         bcr_epis[i] = sed[i]/cost[i]
+        sed_epis[i] = sed[i]
 
 bcr_epis
 near_wld_maple['bcr_epis'] = bcr_epis
 near_wld_maple['bcr_epis']
+near_wld_maple['SedRed_epis'] = sed_epis
+#topname_epis
 for t in range(len(top)):
     near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr_epis').index,topname_epis[t]] = 1
 
-sedsum_epis = [sum(sed * near_wld_maple[i]) for i in topname_epis]
+sedsum_epis = [sum(sed_epis * near_wld_maple[i]) for i in topname_epis]
 sedsum_epis 
 costsum_epis = [sum(cost * near_wld_maple[i]) for i in topname_epis]
 costsum_epis
 
+sedsum = [sum(sed_epis * near_wld_maple[i]) for i in topname]
+
+costsum = [sum(cost * near_wld_maple[i]) for i in topname]
+
 ##########EA
+
+
 parcelid =  near_wld_maple.Site_ID
 sed = near_wld_maple.SedRed
 cost = near_wld_maple.Cost
@@ -114,8 +124,8 @@ items.values()
 
 
 
-creator.create("Fitness", base.Fitness, weights=(-1.0, 1.0))
-creator.create("Individual", set, fitness=creator.Fitness)
+#creator.create("Fitness", base.Fitness, weights=(-1.0, 1.0))
+#creator.create("Individual", set, fitness=creator.Fitness)
 
 def initIndividual(icls, content):
     return icls(content)
@@ -191,7 +201,7 @@ toolbox.register("select", tools.selNSGA2)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def main():
-    NGEN = 10000
+    NGEN = 5000
     MU = 50
     LAMBDA = 100
     CXPB = 0.7
@@ -233,7 +243,7 @@ max(noseedsed_f)
 ##############bcr seeding
 
 def main():
-    NGEN = 10000
+    NGEN = 5000
     MU = 50
     LAMBDA = 100
     CXPB = 0.7

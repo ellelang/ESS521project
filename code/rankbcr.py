@@ -36,6 +36,8 @@ maple29data.to_csv(data_folder/'output/bcr_ranking_MAPsub29.csv', index = False)
 sed = maple29data['SedRed']
 cost = maple29data['Cost']
 
+sum(sed * maple29data['Top10'])
+
 sedsum = [sum(sed * maple29data[i]) for i in topname]
 
 costsum = [sum(cost * maple29data[i]) for i in topname]
@@ -47,27 +49,43 @@ topname_epis = ["Top_epis" + str(i) for i in top]
 topname_epis
 cluster_size = maple29data['Cluster_size']
 sedrank =  maple29data['Sedrank']
+
+
+
 for i in range (len(top)):
     maple29data[topname_epis[i]] = [0]* NBR_ITEMS
     
 bcr_epis = [None]*NBR_ITEMS
+sed_epis = [None]*NBR_ITEMS
+
 for i in range(NBR_ITEMS):
     topn = int(np.ceil(cluster_size[i]/2))
     if sedrank[i] > topn:
         bcr_epis[i] = 0
+        sed_epis[i] = 0
     else:
         bcr_epis[i] = sed[i]/cost[i]
+        sed_epis[i] = sed[i]
 
 bcr_epis
+sed_epis
 maple29data['bcr_epis'] = bcr_epis
 maple29data['bcr_epis']
+maple29data['SedRed_epis'] = sed_epis
+
 for t in range(len(top)):
     maple29data.loc[maple29data.nlargest(top[t],'bcr_epis').index,topname_epis[t]] = 1
 
-sedsum_epis = [sum(sed * maple29data[i]) for i in topname_epis]
+sedsum_epis = [sum(sed_epis * maple29data[i]) for i in topname_epis]
 sedsum_epis 
 costsum_epis = [sum(cost * maple29data[i]) for i in topname_epis]
 costsum_epis
+
+sedsum = [sum(sed_epis * maple29data[i]) for i in topname]
+
+costsum = [sum(cost * maple29data[i]) for i in topname]
+
+
 
 df_seeds = maple29data[topname]
 df_seeds.to_csv(data_folder/'output/bcr_seeds.csv', index = False)
@@ -95,7 +113,7 @@ plt.scatter(sed_f, cost_f, c='r', marker='s', label='EA_bcrseed')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
-plt.savefig('paretofront_compare.png',dpi = 100)
+plt.savefig('maple29_paretofront_compare.png',dpi = 100)
 plt.show()
 
 

@@ -87,6 +87,16 @@ def evalKnapsack(individual):
     
     return cost_val, sed_val
 
+
+def evalKnapsack_simple(individual):
+    cost_val = 0.0
+    sed_val = 0.0
+    for i in individual:
+        cost_val += items[i][0]
+        sed_val += items[i][1]
+    
+    return cost_val, sed_val
+
 def cxSet(ind1, ind2):
     """Apply a crossover operation on input sets. The first child is the
     intersection of the two sets, the second child is the difference of the
@@ -110,14 +120,14 @@ def mutSet(individual):
 
 
 
-toolbox.register("evaluate", evalKnapsack)
+toolbox.register("evaluate", evalKnapsack_simple)
 toolbox.register("mate", cxSet)
 toolbox.register("mutate", mutSet)
 toolbox.register("select", tools.selNSGA2)
 
 
 def main():
-    NGEN = 10000
+    NGEN = 50
     MU = 50
     LAMBDA = 100
     CXPB = 0.7
@@ -154,7 +164,7 @@ noseedpop_results
 
 noseedcost_f = noseedfront[:,0]
 noseedsed_f = noseedfront[:,1]
-max(noseedsed_f)
+
 
 ##############bcr seeding
     
@@ -170,9 +180,13 @@ sed_f = front[:,1]
 
 
 
-
-plt.scatter(noseedsed_f, noseedcost_f)
-plt.scatter(sed_f, cost_f)
+plt.scatter(sedsum, costsum, c='b', marker='x', label='bcr_ranking')
+plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
+plt.scatter(sed_f, cost_f,c='r', marker='s', label='EA_bcrseed')
+plt.legend(loc='upper left')
+plt.xlabel('Sed_Reduction')
+plt.ylabel('Cost')
+plt.show()
 
 
 
