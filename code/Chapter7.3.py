@@ -17,7 +17,7 @@ shadegrid = "lidarrelief.asc"
 # Sun direction
 azimuth = 315.0
 # Sun angle\
-
+altitude = 45.0
 
 # Elevation exagerationexaggeration
 z = 1.0
@@ -87,13 +87,14 @@ for pane in window:
 
 slope
 
+
 # Open the output file, add the header, save the slope grid
 with open(slopegrid, "wb") as f:
-    f.write(bytes(header, "UTF-8")
+    f.write(bytes(header, "UTF-8"))
     np.savetxt(f, slope, fmt="%4i")
 # Open the output file, add the header, save the aspectgrid
 with open(aspectgrid, "wb") as f:
-    f.write(bytes(header, "UTF-8")
+    f.write(bytes(header, "UTF-8"))
     np.savetxt(f, aspect, fmt="%4i")
 # Open the output file, add the header, save the relief grid
 with open(shadegrid, "wb") as f:
