@@ -29,7 +29,7 @@ def pairwise(iterable):
 shp = "road_network.shp"
 
 
-G = nx.Graph()
+G = nx.DiGraph()
 r = shapefile.Reader(shp)
 
 for s in r.shapes():
@@ -43,9 +43,9 @@ r = shapefile.Reader("start_end")
 start = r.shape(0).points[0]
 end = r.shape(1).points[0]
 
-for n0, n1 in sg.edges_iter_():
+for n0, n1 in sg.edges:
     dist = haversine(n0, n1)
-    sg.edge[n0][n1]["dist"] = dist
+    sg.edges[n0][n1]["dist"] = dist
     
 
 nn_start = None
