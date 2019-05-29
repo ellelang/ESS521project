@@ -23,6 +23,8 @@ near_wld_maple["Sedrank"] = near_wld_maple.groupby("NEAR_FID")["SedRed"].rank("d
 near_wld_maple["Sedrank"]
 near_wld_maple["bcr"] = near_wld_maple.SedRed/near_wld_maple.Cost
 near_wld_maple["bcr"]
+sed = near_wld_maple['SedRed']
+cost = near_wld_maple['Cost']
 
 def countX(lst, x): 
     return lst.count(x)
@@ -47,12 +49,10 @@ for i in range (len(top)):
     near_wld_maple[topname[i]] = [0]* NBR_ITEMS
 
 for t in range(len(top)):
-    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr').index,topname[t]] = 1 
+    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'SedRed').index,topname[t]] = 1 
+#near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr').index,topname[t]] = 1 
+#near_wld_maple.to_csv(data_folder/'output/bcr_ranking_MAP.csv', index = False)
 
-near_wld_maple.to_csv(data_folder/'output/bcr_ranking_MAP.csv', index = False)
-
-sed = near_wld_maple['SedRed']
-cost = near_wld_maple['Cost']
 
 
 
@@ -86,8 +86,12 @@ near_wld_maple['bcr_epis'] = bcr_epis
 near_wld_maple['bcr_epis']
 near_wld_maple['SedRed_epis'] = sed_epis
 #topname_epis
+    
 for t in range(len(top)):
-    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr_epis').index,topname_epis[t]] = 1
+    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'SedRed_epis').index,topname_epis[t]] = 1
+#near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr_epis').index,topname_epis[t]] = 1    
+near_wld_maple.to_csv(data_folder/'output/bcr_ranking_MAP.csv', index = False)
+
 
 sedsum_epis = [sum(sed_epis * near_wld_maple[i]) for i in topname_epis]
 sedsum_epis 
@@ -97,6 +101,34 @@ costsum_epis
 sedsum = [sum(sed_epis * near_wld_maple[i]) for i in topname]
 
 costsum = [sum(cost * near_wld_maple[i]) for i in topname]
+
+
+bcr_ranking_noepis = [None]*NBR_ITEMS
+
+for i in range (len(top)):
+    near_wld_maple[topname[i]] = [0]* NBR_ITEMS
+
+for t in range(len(top)):
+    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr').index,topname[t]] = 1
+bcr_ranking_noepis = [sum(sed * near_wld_maple[i]) for i in topname]
+cost_noepis  = [sum(cost * near_wld_maple[i]) for i in topname]
+
+plt.scatter(sedsum, costsum, c='b', marker='x', label='sed_ranking')
+plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='sed_ranking_epistasis')
+plt.scatter(bcr_ranking_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+
+plt.legend(loc='upper left')
+plt.xlabel('Sed_Reduction')
+plt.ylabel('Cost')
+plt.show()
+
+########EA 
+
+
+
+
+
+
 
 ##########EA
 
@@ -154,6 +186,16 @@ toolbox.register("population_guess", initPopulation, list, toolbox.individual_gu
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 
+def evalKnapsack_simple(individual):
+    cost_val = 0.0
+    sed_val = 0.0
+    for i in individual:
+        cost_val += items[i][0]
+        sed_val += items[i][1]
+    return cost_val, sed_val
+        
+
+
 
 
 def evalKnapsack(individual):
@@ -193,7 +235,7 @@ def mutSet(individual):
     return individual,
 
 
-toolbox.register("evaluate", evalKnapsack)
+toolbox.register("evaluate", evalKnapsack_simple)
 toolbox.register("mate", cxSet)
 toolbox.register("mutate", mutSet)
 toolbox.register("select", tools.selNSGA2)
@@ -235,7 +277,7 @@ noseedpop_results.sort(key=lambda x: x.fitness.values)
 noseedpop_results[0]
 noseedpop_results[-1]
 noseedpop_results
-
+noseedfront
 noseedcost_f = noseedfront[:,0]
 noseedsed_f = noseedfront[:,1]
 max(noseedsed_f)
@@ -284,10 +326,13 @@ bcrseed_sed_f = bcrseed_front[:,1]
 
 plt.scatter(sedsum, costsum, c='b', marker='x', label='bcr_ranking')
 plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_epistasis')
+plt.show()
+
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
 plt.scatter(bcrseed_sed_f, bcrseed_cost_f, c='r', marker='s', label='EA_bcrseed')
+plt.scatter(bcr_ranking_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
-plt.savefig('maple_paretofront_compare.png',dpi = 100)
+#plt.savefig('maple_paretofront_compare.png',dpi = 100)
 plt.show()

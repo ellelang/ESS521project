@@ -31,7 +31,7 @@ maple29data.columns
 for t in range(len(top)):
     maple29data.loc[maple29data.nlargest(top[t],'bcr').index,topname[t]] = 1 
 
-maple29data.to_csv(data_folder/'output/bcr_ranking_MAPsub29.csv', index = False)
+#maple29data.to_csv(data_folder/'output/bcr_ranking_MAPsub29.csv', index = False)
 
 sed = maple29data['SedRed']
 cost = maple29data['Cost']
@@ -76,6 +76,9 @@ maple29data['SedRed_epis'] = sed_epis
 for t in range(len(top)):
     maple29data.loc[maple29data.nlargest(top[t],'bcr_epis').index,topname_epis[t]] = 1
 
+maple29data.to_csv(data_folder/'output/bcr_ranking_MAPsub29.csv', index = False)
+
+
 sedsum_epis = [sum(sed_epis * maple29data[i]) for i in topname_epis]
 sedsum_epis 
 costsum_epis = [sum(cost * maple29data[i]) for i in topname_epis]
@@ -108,6 +111,8 @@ json.dump(seeds_array_epis_to_list, open(data_folder/json_file, 'w', encoding='u
 
 plt.scatter(sedsum, costsum, c='b', marker='x', label='bcr_ranking')
 plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_epistasis')
+plt.show()
+
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
 plt.scatter(sed_f, cost_f, c='r', marker='s', label='EA_bcrseed')
 plt.legend(loc='upper left')
