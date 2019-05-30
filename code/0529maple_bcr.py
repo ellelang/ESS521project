@@ -14,25 +14,36 @@ from deap.benchmarks.tools import diversity, convergence, hypervolume
 from deap import creator
 from deap import tools
 
-plt.style.use('bmh')
-wcmodata_maple = pd.read_csv(data_folder/'output/wcmo_MAP.csv')
-wcmodata_maple.shape
-near_wld_maple0 = wcmodata_maple[['Site_ID','SedRed','Cost','NEAR_FID', 'NEAR_DIST','area_m2']].sort_values(by=['NEAR_FID','SedRed'])
-near_wld_maple0
-near_wld_maple0["Sedrank"] = near_wld_maple0.groupby("NEAR_FID")["SedRed"].rank("dense", ascending=False)
-near_wld_maple0["Sedrank"]
-near_wld_maple0["bcr"] = near_wld_maple0.SedRed/near_wld_maple0.Cost
-near_wld_maple0["bcr"]
-sed = near_wld_maple0['SedRed']
-cost = near_wld_maple0['Cost']
-
-near_wld_maple0.to_csv(data_folder/'output/save_groupby_bcr_ranking_MAP.csv', index = False)
-
 near_wld_maple = pd.read_csv(data_folder/'output/save_groupby_bcr_ranking_MAP.csv')
+near_wld_maple.columns
+near_wld_maple.shape
+sed = near_wld_maple['SedRed']
+cost = near_wld_maple['Cost']
+NBR_ITEMS = 2351
+top = np.arange(10,2351,10)
+topname = ["Top" + str(i) for i in top]
+topname
+
+for t in range(len(top)):
+    near_wld_maple[topname[t]] = [0]* NBR_ITEMS
+    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr').index,topname[t]] = 1
+
+sed_noepis = [sum(sed * near_wld_maple[i]) for i in topname]
+cost_noepis  = [sum(cost * near_wld_maple[i]) for i in topname]
+
+plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+
+####################
+
+##save seeds
+seeds_array = np.array(near_wld_maple[topname])
+seeds_array
+seeds_array_to_list = seeds_array.tolist()
+json_file = "bcrseeds_maple.json" 
+json.dump(seeds_array_to_list, open(data_folder/json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
 
 
-near_wld_maple
-
+#########add interactions
 
 def countX(lst, x): 
     return lst.count(x)
@@ -43,26 +54,10 @@ lst = clid
 near_wld_maple['Cluster_size'] = [countX(lst, x) for x in clid]
 near_wld_maple['Cluster_size']
 
-
-
-NBR_ITEMS = 2351
-top = np.arange(10,2351,10)
-top
-range(len(top))
-topname = ["Top" + str(i) for i in top]
-topname
-
-
-len(topname)
-
-
-
-#########add interactions
 topname_epis = ["Top_epis" + str(i) for i in top]
 topname_epis
 cluster_size = near_wld_maple['Cluster_size']
 sedrank =  near_wld_maple['Sedrank']
-NBR_ITEMS
     
 bcr_epis = [None]*NBR_ITEMS
 sed_epis = [None]*NBR_ITEMS
@@ -80,86 +75,45 @@ bcr_epis
 near_wld_maple['bcr_epis'] = bcr_epis
 near_wld_maple['bcr_epis']
 near_wld_maple['SedRed_epis'] = sed_epis
-#topname_epis
- 
 near_wld_maple.to_csv(data_folder/'output/bcr_ranking_MAP.csv', index = False)
 
- 
 
-#no interaction
-
-for i in range (len(top)):
-    near_wld_maple[topname[i]] = [0]* NBR_ITEMS
 
 for t in range(len(top)):
-    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr').index,topname[t]] = 1 
-
-#near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr').index,topname[t]] = 1 
-#near_wld_maple.to_csv(data_folder/'output/bcr_ranking_MAP.csv', index = False)
-
-##save seeds
-seeds_array = np.array(near_wld_maple[topname])
-seeds_array
-seeds_array_to_list = seeds_array.tolist()
-json_file = "bcrseeds_maple.json" 
-json.dump(seeds_array_to_list, open(data_folder/json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
-
-############interaction 
-for i in range (len(top)):
-    near_wld_maple[topname_epis[i]] = [0]* NBR_ITEMS
-
-for t in range(len(top)):
+    near_wld_maple[topname_epis[t]] = [0]* NBR_ITEMS
     near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr_epis').index,topname_epis[t]] = 1
 #near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr_epis').index,topname_epis[t]] = 1    
-
 
 sedsum_epis = [sum(sed_epis * near_wld_maple[i]) for i in topname_epis]
 sedsum_epis 
 costsum_epis = [sum(cost * near_wld_maple[i]) for i in topname_epis]
 costsum_epis
-
-sedsum = [sum(sed_epis * near_wld_maple[i]) for i in topname]
-
-costsum = [sum(cost * near_wld_maple[i]) for i in topname]
-
-
-bcr_ranking_noepis = [None]*NBR_ITEMS
-
-for i in range (len(top)):
-    near_wld_maple[topname[i]] = [0]* NBR_ITEMS
-
-for t in range(len(top)):
-    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr').index,topname[t]] = 1
-bcr_ranking_noepis = [sum(sed * near_wld_maple[i]) for i in topname]
-cost_noepis  = [sum(cost * near_wld_maple[i]) for i in topname]
-
-
-
-
-plt.scatter(sedsum, costsum, c='b', marker='x', label='bcr_ranking')
 plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_ranking_epistasis')
-plt.scatter(bcr_ranking_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 
+
+sedsum_ignore_epis = [sum(sed_epis * near_wld_maple[i]) for i in topname]
+sedsum_ignore_epis 
+costsum_ignore_epis = [sum(cost * near_wld_maple[i]) for i in topname]
+costsum_ignore_epis
+plt.scatter(sedsum_ignore_epis,costsum_ignore_epis, c = 'b', marker = 'o', label='bcr_ranking_epistasis')
+
+
+plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
+plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
+#plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
 plt.show()
 
-########EA 
 
 
-
-
-
-
-
+###############
 ##########EA
-
-
 parcelid =  near_wld_maple.Site_ID
 sed = near_wld_maple.SedRed
 cost = near_wld_maple.Cost
-clusts = near_wld_maple.NEAR_FID
+clusters = near_wld_maple.NEAR_FID
 clusterids = list(near_wld_maple.NEAR_FID.unique())
 clusterids
 sed
@@ -170,17 +124,11 @@ sedrank = near_wld_maple.Sedrank
 creator.create("Fitness", base.Fitness, weights=(-1.0, 1.0))
 creator.create("Individual", set, fitness=creator.Fitness)
 
-
 items = {}
 for i in range(NBR_ITEMS):
-    items[i] = (cost[i], sed[i],clusts[i],clustersize[i],sedrank[i])
+    items[i] = (cost[i], sed[i],clusters[i],clustersize[i],sedrank[i])
 
 items.values()
-
-
-
-#creator.create("Fitness", base.Fitness, weights=(-1.0, 1.0))
-#creator.create("Individual", set, fitness=creator.Fitness)
 
 def initIndividual(icls, content):
     return icls(content)
@@ -192,11 +140,7 @@ def initPopulation(pcls, ind_init, filename):
     return pcls(ind_init(c) for c in contents)
 
 
-
-IND_INIT_SIZE = 1000
-
-
-
+IND_INIT_SIZE = 500
 toolbox = base.Toolbox()
 toolbox.register("attr_item", random.randrange, NBR_ITEMS)
 toolbox.register("individual", tools.initRepeat, creator.Individual, 
@@ -206,18 +150,6 @@ toolbox.register("individual_guess", initIndividual, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, data_folder/"bcrseeds_maple.json")
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-
-
-def evalKnapsack_simple(individual):
-    cost_val = 0.0
-    sed_val = 0.0
-    for i in individual:
-        cost_val += items[i][0]
-        sed_val += items[i][1]
-    return cost_val, sed_val
-        
-
-
 
 
 def evalKnapsack(individual):
@@ -266,8 +198,8 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def main():
     NGEN = 505
-    MU = 500
-    LAMBDA = 500
+    MU = 200
+    LAMBDA = 200
     CXPB = 0.7
     MUTPB = 0.2
     #no seeding
@@ -301,8 +233,9 @@ noseedfront = np.array([ind.fitness.values for ind in noseedhof])
 noseedfront
 noseedcost_f = noseedfront[:,0]
 noseedsed_f = noseedfront[:,1]
-#max(noseedsed_f)
 
+
+###############
 ##############bcr seeding
 
 def main():
@@ -343,21 +276,15 @@ bcrseed_front
 bcrseedcost_f = bcrseed_front[:,0]
 bcrseedsed_f = bcrseed_front[:,1]
 
-############
 
 
 
-
-
-
-plt.scatter(sedsum, costsum, c='b', marker='x', label='bcr_ranking')
-plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_epistasis')
-#plt.show()
-###EA fronts
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
-plt.scatter(bcrseedsed_f, bcrseedcost_f, c='r', marker='s', label='EA_bcrseed')
+
+plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
+plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
+#plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
-#plt.savefig('maple_paretofront_compare.png',dpi = 100)
 plt.show()

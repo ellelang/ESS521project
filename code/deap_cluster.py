@@ -56,7 +56,7 @@ def initPopulation(pcls, ind_init, filename):
 
 
 
-IND_INIT_SIZE = 5
+IND_INIT_SIZE = 5000
 MAX_ITEM = 50
 MAX_WEIGHT = 50
 
@@ -71,21 +71,21 @@ toolbox.register("population_guess", initPopulation, list, toolbox.individual_gu
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-def evalKnapsack(individual):
-    cost_val = 0.0
-    sed_val = 0.0
-    for i in individual:
-        cluster_size = items[i][3]
-        topn = int(np.ceil(cluster_size/2))
-        sedrank = items[i][4]
-        if sedrank > topn:
-            cost_val += items[i][0]
-            sed_val += 0
-        else: 
-            cost_val += items[i][0]
-            sed_val += items[i][1]
-    
-    return cost_val, sed_val
+#def evalKnapsack(individual):
+#    cost_val = 0.0
+#    sed_val = 0.0
+#    for i in individual:
+#        cluster_size = items[i][3]
+#        topn = int(np.ceil(cluster_size/2))
+#        sedrank = items[i][4]
+#        if sedrank > topn:
+#            cost_val += items[i][0]
+#            sed_val += 0
+#        else: 
+#            cost_val += items[i][0]
+#            sed_val += items[i][1]
+#    
+#    return cost_val, sed_val
 
 
 def evalKnapsack_simple(individual):
@@ -127,8 +127,51 @@ toolbox.register("select", tools.selNSGA2)
 
 
 def main():
-    NGEN = 50
-    MU = 50
+    NGEN = 500
+    MU = 100
+    LAMBDA = 100
+    CXPB = 0.7
+    MUTPB = 0.2
+    #no seeding
+    pop = toolbox.population(n=MU)
+    #seeding!!
+    #pop = toolbox.population_guess()
+    hof = tools.ParetoFront()
+    #logbook = tools.Logbook()
+    #logbook.header = "gen", "evals", "std", "min", "avg", "max"
+    stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean, axis=0)
+    stats.register("std", np.std, axis=0)
+    stats.register("min", np.min, axis=0)
+    stats.register("max", np.max, axis=0)
+#    
+    algorithms.eaMuPlusLambda(pop, toolbox, MU, LAMBDA, CXPB, MUTPB, NGEN, 
+                              stats,halloffame=hof)
+    
+    
+    return pop, stats, hof
+
+if __name__ == "__main__":
+    results = main()
+
+
+#############no seeding
+noseedpop = results[0]
+noseedstats = results[1]
+noseedhof = results[2] 
+noseedhof
+noseedfront = np.array([ind.fitness.values for ind in noseedhof])
+noseedfront
+noseedcost_f = noseedfront[:,0]
+noseedsed_f = noseedfront[:,1]
+#max(noseedsed_f)
+
+
+##############bcr seeding
+    
+def main():
+    NGEN = 500
+    MU = 100
     LAMBDA = 100
     CXPB = 0.7
     MUTPB = 0.2
@@ -136,53 +179,77 @@ def main():
     #pop = toolbox.population(n=MU)
     #seeding!!
     pop = toolbox.population_guess()
-    #hof = tools.ParetoFront()
-    logbook = tools.Logbook()
-    logbook.header = "gen", "evals", "std", "min", "avg", "max"
+    hof = tools.ParetoFront()
+    #logbook = tools.Logbook()
+    #logbook.header = "gen", "evals", "std", "min", "avg", "max"
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean, axis=0)
     stats.register("std", np.std, axis=0)
     stats.register("min", np.min, axis=0)
     stats.register("max", np.max, axis=0)
 #    
-    pop, logbook = algorithms.eaMuPlusLambda(pop, toolbox, MU, LAMBDA, CXPB, MUTPB, NGEN, 
-                              stats)
-    front = np.array([ind.fitness.values for ind in pop])
+    algorithms.eaMuPlusLambda(pop, toolbox, MU, LAMBDA, CXPB, MUTPB, NGEN, stats,
+                              halloffame=hof)
+    #front = np.array([ind.fitness.values for ind in pop])
     
-    return pop, front
+    return pop, stats, hof
 
 if __name__ == "__main__":
-    results = main()
+    bcrseed_results = main()
 
-#############no seeding
-noseedfront = results[1]
-noseedpop_results = results[0]
-noseedpop_results.sort(key=lambda x: x.fitness.values)
-noseedpop_results[0]
-noseedpop_results[-1]
-noseedpop_results
+#############Seedings
+bcrseed_pop = bcrseed_results[0]
+bcrseed_stats = bcrseed_results[1]
+bcrseed_hof = bcrseed_results[2] 
 
-noseedcost_f = noseedfront[:,0]
-noseedsed_f = noseedfront[:,1]
+bcrseed_front = np.array([ind.fitness.values for ind in bcrseed_hof])
+bcrseed_front
+bcrseedcost_f = bcrseed_front[:,0]
+bcrseedsed_f = bcrseed_front[:,1]
+
+##########
+maple29data = pd.read_csv(data_folder/'output/prep2_MAP_sub29.csv')
+maple29data.columns
+maple29data.index
+NBR_ITEMS = 468
+top = np.arange(10,469,10)
+top
+range(len(top))
+topname = ["Top" + str(i) for i in top]
+topname
 
 
-##############bcr seeding
-    
-front = results[1]
-pop_results = results[0]
-pop_results.sort(key=lambda x: x.fitness.values)
-pop_results[0]
-pop_results[-1]
-pop_results
+for i in range (len(top)):
+    maple29data[topname[i]] = [0]* NBR_ITEMS
 
-cost_f = front[:,0]
-sed_f = front[:,1]
+
+maple29data.iloc[maple29data.nlargest(3,'bcr').index]
+
+maple29data.loc[maple29data.nlargest(3,'bcr').index,'Top10'] = 1 
+maple29data.loc[maple29data.nlargest(3,'bcr').index]['Top10']
+
+maple29data.columns
+
+for t in range(len(top)):
+    maple29data.loc[maple29data.nlargest(top[t],'bcr').index,topname[t]] = 1 
+
+#maple29data.to_csv(data_folder/'output/bcr_ranking_MAPsub29.csv', index = False)
+
+sed = maple29data['SedRed']
+cost = maple29data['Cost']
+
+sum(sed * maple29data['Top10'])
+
+sedsum = [sum(sed * maple29data[i]) for i in topname]
+
+costsum = [sum(cost * maple29data[i]) for i in topname]
+
 
 
 
 plt.scatter(sedsum, costsum, c='b', marker='x', label='bcr_ranking')
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
-plt.scatter(sed_f, cost_f,c='r', marker='s', label='EA_bcrseed')
+plt.scatter(bcrseedsed_f, bcrseedcost_f,c='r', marker='s', label='EA_bcrseed')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
