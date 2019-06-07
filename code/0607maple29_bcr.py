@@ -59,7 +59,7 @@ cost_noepis  = [sum(cost * dataset[i]) for i in topname]
 sed_noepis
 #plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_sed')
 
-
+dataset.iloc[dataset.nonzero()[topname]]
 
 seeds_array = np.array(dataset[topname])
 seeds_array

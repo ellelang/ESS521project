@@ -59,7 +59,7 @@ bcr_epis = [None]*NBR_ITEMS
 sed_epis = [None]*NBR_ITEMS
 
 for i in range(NBR_ITEMS):
-    topn = int(np.ceil(cluster_size[i]/2))
+    topn = int(np.ceil(cluster_size[i]/3))
     if sedrank[i] > topn:
         bcr_epis[i] = 0
         sed_epis[i] = 0

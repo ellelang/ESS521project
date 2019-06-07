@@ -144,7 +144,7 @@ cost_noepis  = [sum(cost * near_wld_maple[i]) for i in topname]
 
 plt.scatter(sedsum, costsum, c='b', marker='x', label='bcr_ranking')
 plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_ranking_epistasis')
-plt.scatter(bcr_ranking_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+#plt.scatter(bcr_ranking_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
