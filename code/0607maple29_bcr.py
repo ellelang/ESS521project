@@ -59,14 +59,14 @@ cost_noepis  = [sum(cost * dataset[i]) for i in topname]
 sed_noepis
 #plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_sed')
 
-dataset.iloc[dataset.nonzero()[topname]]
-
-seeds_array = np.array(dataset[topname])
-seeds_array
-seeds_array_to_list = seeds_array.tolist()
-seeds_array_to_list
+##########save seeds
+seedslist = []
+for i in range(len(top)):
+    indexvalues = dataset.index[dataset[topname[i]] == 1].tolist()
+    seedslist.append(indexvalues)
+np.array(seedslist)
 json_file = "bcrseeds_maple29.json" 
-json.dump(seeds_array_to_list, open(data_folder/json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
+json.dump(seedslist, open(data_folder/json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
 
 #########add interactions
 
@@ -295,7 +295,7 @@ noseedsed_f = noseedfront[:,1]
 ###############
 ##############bcr seeding
 def main():
-    NGEN = 5000
+    NGEN = 1000
     MU = 100
     LAMBDA = 100
     CXPB = 0.7

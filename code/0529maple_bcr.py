@@ -36,11 +36,22 @@ plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_
 ####################
 
 ##save seeds
-seeds_array = np.array(near_wld_maple[topname])
-seeds_array
-seeds_array_to_list = seeds_array.tolist()
+
+##########save seeds
+seedslist = []
+for i in range(len(top)):
+    indexvalues = near_wld_maple.index[near_wld_maple[topname[i]] == 1].tolist()
+    seedslist.append(indexvalues)
+np.array(seedslist)
 json_file = "bcrseeds_maple.json" 
-json.dump(seeds_array_to_list, open(data_folder/json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
+json.dump(seedslist, open(data_folder/json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
+
+#
+#seeds_array = np.array(near_wld_maple[topname])
+#seeds_array
+#seeds_array_to_list = seeds_array.tolist()
+#json_file = "bcrseeds_maple.json" 
+#json.dump(seeds_array_to_list, open(data_folder/json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
 
 
 #########add interactions
