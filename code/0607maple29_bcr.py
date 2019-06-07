@@ -333,7 +333,7 @@ bcrseedsed_f = bcrseed_front[:,1]
 
 
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
-#plt.scatter(bcrseedsed_f, bcrseedcost_f, c='r', marker='s', label='EA_bcrseed')
+plt.scatter(bcrseedsed_f, bcrseedcost_f, c='r', marker='s', label='EA_bcrseed')
 #plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
 #plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
 plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
