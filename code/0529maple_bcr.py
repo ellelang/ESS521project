@@ -26,12 +26,12 @@ topname
 
 for t in range(len(top)):
     near_wld_maple[topname[t]] = [0]* NBR_ITEMS
-    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr').index,topname[t]] = 1
+    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'SedRed').index,topname[t]] = 1
 
 sed_noepis = [sum(sed * near_wld_maple[i]) for i in topname]
 cost_noepis  = [sum(cost * near_wld_maple[i]) for i in topname]
 
-plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_sed')
 
 ####################
 
@@ -58,13 +58,13 @@ topname_epis = ["Top_epis" + str(i) for i in top]
 topname_epis
 cluster_size = near_wld_maple['Cluster_size']
 sedrank =  near_wld_maple['Sedrank']
-    
+disrank = near_wld_maple['NEARrank']
 bcr_epis = [None]*NBR_ITEMS
 sed_epis = [None]*NBR_ITEMS
 
 for i in range(NBR_ITEMS):
     topn = int(np.ceil(cluster_size[i]/2))
-    if sedrank[i] > topn:
+    if disrank[i] > topn:
         bcr_epis[i] = 0
         sed_epis[i] = 0
     else:
@@ -81,7 +81,7 @@ near_wld_maple.to_csv(data_folder/'output/bcr_ranking_MAP.csv', index = False)
 
 for t in range(len(top)):
     near_wld_maple[topname_epis[t]] = [0]* NBR_ITEMS
-    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr_epis').index,topname_epis[t]] = 1
+    near_wld_maple.loc[near_wld_maple.nlargest(top[t],'SedRed_epis').index,topname_epis[t]] = 1
 #near_wld_maple.loc[near_wld_maple.nlargest(top[t],'bcr_epis').index,topname_epis[t]] = 1    
 
 sedsum_epis = [sum(sed_epis * near_wld_maple[i]) for i in topname_epis]
@@ -95,11 +95,11 @@ sedsum_ignore_epis = [sum(sed_epis * near_wld_maple[i]) for i in topname]
 sedsum_ignore_epis 
 costsum_ignore_epis = [sum(cost * near_wld_maple[i]) for i in topname]
 costsum_ignore_epis
-plt.scatter(sedsum_ignore_epis,costsum_ignore_epis, c = 'b', marker = 'o', label='bcr_ranking_epistasis')
+#plt.scatter(sedsum_ignore_epis,costsum_ignore_epis, c = 'b', marker = 'o', label='bcr_ranking_epistasis')
 
-
-plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
-plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
+#plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='ignore_epistasis')
+plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='consider_epistasis')
 #plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
@@ -126,7 +126,7 @@ creator.create("Individual", set, fitness=creator.Fitness)
 
 items = {}
 for i in range(NBR_ITEMS):
-    items[i] = (cost[i], sed[i],clusters[i],clustersize[i],sedrank[i])
+    items[i] = (cost[i], sed[i])
 
 items.values()
 
@@ -151,22 +151,31 @@ toolbox.register("population_guess", initPopulation, list, toolbox.individual_gu
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-
 def evalKnapsack(individual):
     cost_val = 0.0
     sed_val = 0.0
     for i in individual:
-        cluster_size = items[i][3]
-        topn = int(np.ceil(cluster_size/2))
-        sedrank = items[i][4]
-        if sedrank > topn:
-            cost_val += items[i][0]
-            sed_val += 0
-        else: 
-            cost_val += items[i][0]
-            sed_val += items[i][1]
-    
+        cost_val += items[i][0]
+        sed_val += items[i][1]
     return cost_val, sed_val
+        
+    
+#
+#def evalKnapsack(individual):
+#    cost_val = 0.0
+#    sed_val = 0.0
+#    for i in individual:
+#        cluster_size = items[i][3]
+#        topn = int(np.ceil(cluster_size/2))
+#        sedrank = items[i][4]
+#        if sedrank > topn:
+#            cost_val += items[i][0]
+#            sed_val += 0
+#        else: 
+#            cost_val += items[i][0]
+#            sed_val += items[i][1]
+#    
+#    return cost_val, sed_val
 
 
 def cxSet(ind1, ind2):
@@ -197,9 +206,9 @@ toolbox.register("select", tools.selNSGA2)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def main():
-    NGEN = 505
-    MU = 200
-    LAMBDA = 200
+    NGEN = 1000
+    MU = 100
+    LAMBDA = 100
     CXPB = 0.7
     MUTPB = 0.2
     #no seeding
@@ -239,9 +248,9 @@ noseedsed_f = noseedfront[:,1]
 ##############bcr seeding
 
 def main():
-    NGEN = 505
-    MU = 500
-    LAMBDA = 500
+    NGEN = 10000
+    MU = 100
+    LAMBDA = 100
     CXPB = 0.7
     MUTPB = 0.2
     #no seeding
@@ -280,10 +289,10 @@ bcrseedsed_f = bcrseed_front[:,1]
 
 
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
-
+plt.scatter(bcrseedsed_f, bcrseedcost_f, c='r', marker='s', label='EA_bcrseed')
 plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
 plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
-#plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')

@@ -21,6 +21,11 @@ near_wld_maple0 = wcmodata_maple[['Site_ID','SedRed','Cost','NEAR_FID', 'NEAR_DI
 near_wld_maple0
 near_wld_maple0["Sedrank"] = near_wld_maple0.groupby("NEAR_FID")["SedRed"].rank("dense", ascending=False)
 near_wld_maple0["Sedrank"]
+near_wld_maple0["NEAR_DIST"]
+near_wld_maple0["NEARrank"] = near_wld_maple0.groupby("NEAR_FID")["NEAR_DIST"].rank("dense", ascending=True)
+near_wld_maple0["NEARrank"]
+
+
 near_wld_maple0["bcr"] = near_wld_maple0.SedRed/near_wld_maple0.Cost
 near_wld_maple0["bcr"]
 sed = near_wld_maple0['SedRed']
@@ -31,7 +36,7 @@ near_wld_maple0.to_csv(data_folder/'output/save_groupby_bcr_ranking_MAP.csv', in
 near_wld_maple = pd.read_csv(data_folder/'output/save_groupby_bcr_ranking_MAP.csv')
 
 
-near_wld_maple
+near_wld_maple.columns
 
 
 def countX(lst, x): 
@@ -62,14 +67,15 @@ topname_epis = ["Top_epis" + str(i) for i in top]
 topname_epis
 cluster_size = near_wld_maple['Cluster_size']
 sedrank =  near_wld_maple['Sedrank']
-NBR_ITEMS
+disrank =  near_wld_maple['NEARrank']
+NBR_ITEMS = 2351
     
 bcr_epis = [None]*NBR_ITEMS
 sed_epis = [None]*NBR_ITEMS
 
 for i in range(NBR_ITEMS):
     topn = int(np.ceil(cluster_size[i]/2))
-    if sedrank[i] > topn:
+    if disrank[i] > topn:
         bcr_epis[i] = 0
         sed_epis[i] = 0
     else:
