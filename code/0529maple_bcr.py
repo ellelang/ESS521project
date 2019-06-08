@@ -297,17 +297,72 @@ bcrseed_front
 bcrseedcost_f = bcrseed_front[:,0]
 bcrseedsed_f = bcrseed_front[:,1]
 
+#############no interaction EA
+
+toolbox.register("evaluate", evalKnapsack_simple)
+
+
+def main():
+    NGEN = 1000
+    MU = 100
+    LAMBDA = 100
+    CXPB = 0.7
+    MUTPB = 0.2
+    #no seeding
+    #pop = toolbox.population(n=MU)
+    #seeding!!
+    pop = toolbox.population_guess()
+    hof = tools.ParetoFront()
+    #logbook = tools.Logbook()
+    #logbook.header = "gen", "evals", "std", "min", "avg", "max"
+    stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean, axis=0)
+    stats.register("std", np.std, axis=0)
+    stats.register("min", np.min, axis=0)
+    stats.register("max", np.max, axis=0)
+#    
+    algorithms.eaMuPlusLambda(pop, toolbox, MU, LAMBDA, CXPB, MUTPB, NGEN, stats,
+                              halloffame=hof)
+    #front = np.array([ind.fitness.values for ind in pop])
+    
+    return pop, stats, hof
+
+if __name__ == "__main__":
+   noepis_seed_results = main()
+
+
+noepis_seed_pop = noepis_seed_results[0]
+noepis_seed_stats = noepis_seed_results[1]
+noepis_seed_hof = noepis_seed_results[2] 
+
+noepis_seed_front = np.array([ind.fitness.values for ind in noepis_seed_hof])
+noepis_seed_front
+noepis_seedcost_f = noepis_seed_front[:,0]
+noepis_seedsed_f = noepis_seed_front[:,1]
+
+plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+plt.scatter(noepis_seedsed_f, noepis_seedcost_f, c='r', marker='s', label='no_epistasisEA_seed')
+plt.legend(loc='upper left')
+plt.xlabel('Sed_Reduction')
+plt.ylabel('Cost')
+plt.savefig('maplepfspng_noepistasis.png', dpi=300)
+
+
+############
+
+
+
 
 
 
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
 plt.scatter(bcrseedsed_f, bcrseedcost_f, c='r', marker='s', label='EA_bcrseed')
 plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
-plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
-plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+#plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
+#plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
-plt.savefig('maplepfspng.png', dpi=300)
+plt.savefig('maplepfspng_ignore.png', dpi=300)
 
 plt.show()
