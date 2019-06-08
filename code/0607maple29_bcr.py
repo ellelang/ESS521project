@@ -15,22 +15,22 @@ from deap import creator
 from deap import tools
 
 
-plt.style.use('bmh')
-df = pd.read_csv(data_folder/'output/prep2_MAP_sub29.csv')
-df.shape
-df.columns
-near_wld_maple0 = df[['Site_ID','SedRed','Cost','NEAR_FID', 'NEAR_DIST','area_m2']].sort_values(by=['NEAR_FID','SedRed'])
-near_wld_maple0.columns
-near_wld_maple0["Sedrank"] = near_wld_maple0.groupby("NEAR_FID")["SedRed"].rank("dense", ascending=False)
-near_wld_maple0["Sedrank"]
-near_wld_maple0["NEAR_DIST"]
-near_wld_maple0["NEARrank"] = near_wld_maple0.groupby("NEAR_FID")["NEAR_DIST"].rank("dense", ascending=True)
-near_wld_maple0["NEARrank"]
-
-near_wld_maple0["bcr"] = near_wld_maple0.SedRed/near_wld_maple0.Cost
-near_wld_maple0["bcr"]
-near_wld_maple0.to_csv(data_folder/'output/MAP29save_groupby.csv', index = False)
-
+#plt.style.use('bmh')
+#df = pd.read_csv(data_folder/'output/prep2_MAP_sub29.csv')
+#df.shape
+#df.columns
+#near_wld_maple0 = df[['Site_ID','SedRed','Cost','NEAR_FID', 'NEAR_DIST','area_m2']].sort_values(by=['NEAR_FID','SedRed'])
+#near_wld_maple0.columns
+#near_wld_maple0["Sedrank"] = near_wld_maple0.groupby("NEAR_FID")["SedRed"].rank("dense", ascending=False)
+#near_wld_maple0["Sedrank"]
+#near_wld_maple0["NEAR_DIST"]
+#near_wld_maple0["NEARrank"] = near_wld_maple0.groupby("NEAR_FID")["NEAR_DIST"].rank("dense", ascending=True)
+#near_wld_maple0["NEARrank"]
+#
+#near_wld_maple0["bcr"] = near_wld_maple0.SedRed/near_wld_maple0.Cost
+#near_wld_maple0["bcr"]
+#near_wld_maple0.to_csv(data_folder/'output/MAP29save_groupby.csv', index = False)
+#
 
 dataset = pd.read_csv(data_folder/'output/MAP29save_groupby.csv')
 dataset.shape
@@ -192,7 +192,7 @@ toolbox.register("individual_guess", initIndividual, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, data_folder/"bcrseeds_maple29.json")
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-pop1 = toolbox.population(1000)
+pop1 = toolbox.population(10)
 pop1
 
 pop2 = toolbox.population_guess()
@@ -333,7 +333,7 @@ bcrseedsed_f = bcrseed_front[:,1]
 
 
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
-#plt.scatter(bcrseedsed_f, bcrseedcost_f, c='r', marker='s', label='EA_bcrseed')
+plt.scatter(bcrseedsed_f, bcrseedcost_f, c='r', marker='s', label='EA_bcrseed')
 #plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
 #plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
 plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')

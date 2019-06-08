@@ -137,7 +137,7 @@ creator.create("Individual", set, fitness=creator.Fitness)
 
 items = {}
 for i in range(NBR_ITEMS):
-    items[i] = (cost[i], sed[i])
+    items[i] = (cost[i], sed[i],clustersize[i],disrank[i])
 
 items.values()
 
@@ -162,7 +162,7 @@ toolbox.register("population_guess", initPopulation, list, toolbox.individual_gu
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-def evalKnapsack(individual):
+def evalKnapsack_simple(individual):
     cost_val = 0.0
     sed_val = 0.0
     for i in individual:
@@ -172,21 +172,22 @@ def evalKnapsack(individual):
         
     
 #
-#def evalKnapsack(individual):
-#    cost_val = 0.0
-#    sed_val = 0.0
-#    for i in individual:
-#        cluster_size = items[i][3]
-#        topn = int(np.ceil(cluster_size/2))
-#        sedrank = items[i][4]
-#        if sedrank > topn:
-#            cost_val += items[i][0]
-#            sed_val += 0
-#        else: 
-#            cost_val += items[i][0]
-#            sed_val += items[i][1]
-#    
-#    return cost_val, sed_val
+def evalKnapsack(individual):
+    cost_val = 0.0
+    sed_val = 0.0
+    for i in individual:
+        cluster_size = items[i][2]
+        topn = int(np.ceil(cluster_size/2))
+        disrank = items[i][3]
+        if disrank > topn:
+            cost_val += items[i][0]
+            sed_val += 0
+        else: 
+            cost_val += items[i][0]
+            sed_val += items[i][1]
+    
+    return cost_val, sed_val
+
 
 
 def cxSet(ind1, ind2):
@@ -259,7 +260,7 @@ noseedsed_f = noseedfront[:,1]
 ##############bcr seeding
 
 def main():
-    NGEN = 10000
+    NGEN = 5000
     MU = 100
     LAMBDA = 100
     CXPB = 0.7
@@ -307,4 +308,6 @@ plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
+plt.savefig('maplepfspng.png', dpi=300)
+
 plt.show()
