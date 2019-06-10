@@ -15,6 +15,9 @@ from deap import creator
 from deap import tools
 
 
+
+
+
 #plt.style.use('bmh')
 #df = pd.read_csv(data_folder/'output/prep2_MAP_sub29.csv')
 #df.shape
@@ -37,7 +40,7 @@ dataset.shape
 NBR_ITEMS = 468
 
 
-top = np.arange(10,468,10)
+top = np.arange(10,468,5)
 topname = ["Top" + str(i) for i in top]
 topname
 for t in range(len(top)):
@@ -115,34 +118,43 @@ sedsum_ignore_epis = [sum(sed_epis * dataset[i]) for i in topname]
 sedsum_ignore_epis 
 costsum_ignore_epis = [sum(cost * dataset[i]) for i in topname]
 costsum_ignore_epis
-plt.scatter(sedsum_ignore_epis,costsum_ignore_epis, c = 'b', marker = 'o', label='ignore_ranking_epistas')
-plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='consider_ranking_epistasis')
-plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+plt.scatter(sedsum_ignore_epis,costsum_ignore_epis, c = 'b', marker = 'o', label='ignore_epistas_bcr')
+plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='epistasis_bcr')
+#plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
+plt.grid(None)
+plt.savefig('bcr_epistasis_maple29.png',dpi = 300,bbox_inches='tight')
 plt.show()
 
 
 #plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
-plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
-plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
-#plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+#plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
+plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='with_epistasis')
+plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
+plt.grid(None)
+plt.savefig('noepistasis_maple29.png',dpi = 300,bbox_inches='tight')
+
 plt.show()
 
 #plt.scatter(sedsum_ignore_epis,costsum_ignore_epis, c = 'b', marker = 'o', label='bcr_ranking_epistasis')
 
 
-plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+#plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
-plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
+plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='True_pf_epistasis')
 #plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
+plt.grid(None)
+plt.savefig('bcrepis_maple29.png',dpi = 300,bbox_inches='tight')
+
+
 plt.show()
 
 
@@ -154,6 +166,7 @@ cost = dataset.Cost
 clusters = dataset.NEAR_FID
 clusterids = list(dataset.NEAR_FID.unique())
 clusterids
+clustersize = dataset.Cluster_size
 sed
 #clustersize = dataset.Cluster_size
 sedrank = dataset.Sedrank
@@ -161,11 +174,12 @@ disrank = dataset.NEARrank
 
 creator.create("Fitness", base.Fitness, weights=(-1.0, 1.0))
 creator.create("Individual", set, fitness=creator.Fitness)
-items = {}
+
 # Create random items and store them in the items' dictionary.
 
+items = {}
 for i in range(NBR_ITEMS):
-    items[i] = (cost[i], sed[i])
+    items[i] = (cost[i], sed[i],clustersize[i],disrank[i])
 
 items.values()
 
@@ -199,7 +213,7 @@ pop2 = toolbox.population_guess()
 pop2
 
 
-def evalKnapsack(individual):
+def evalKnapsack_simple(individual):
     cost_val = 0.0
     sed_val = 0.0
     for i in individual:
@@ -209,21 +223,21 @@ def evalKnapsack(individual):
         
     
 #
-#def evalKnapsack(individual):
-#    cost_val = 0.0
-#    sed_val = 0.0
-#    for i in individual:
-#        cluster_size = items[i][3]
-#        topn = int(np.ceil(cluster_size/2))
-#        sedrank = items[i][4]
-#        if sedrank > topn:
-#            cost_val += items[i][0]
-#            sed_val += 0
-#        else: 
-#            cost_val += items[i][0]
-#            sed_val += items[i][1]
-#    
-#    return cost_val, sed_val
+def evalKnapsack(individual):
+    cost_val = 0.0
+    sed_val = 0.0
+    for i in individual:
+        cluster_size = items[i][2]
+        topn = int(np.ceil(cluster_size/2))
+        disrank = items[i][3]
+        if disrank > topn:
+            cost_val += items[i][0]
+            sed_val += 0
+        else: 
+            cost_val += items[i][0]
+            sed_val += items[i][1]
+    
+    return cost_val, sed_val
 
 
 def cxSet(ind1, ind2):
@@ -334,10 +348,14 @@ bcrseedsed_f = bcrseed_front[:,1]
 
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
 plt.scatter(bcrseedsed_f, bcrseedcost_f, c='r', marker='s', label='EA_bcrseed')
-#plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
-#plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='bcr_consider_epistasis')
-plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
+plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
+plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='TruePF_epistasis')
+#plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
+plt.grid(None)
+plt.savefig('EAbcr_epistasis.png',dpi = 300,bbox_inches='tight')
+#plt.savefig('seedvsnoseed_epistasis.png',dpi = 300,bbox_inches='tight')
+#plt.savefig('bcr_epistasis.png',dpi = 300,bbox_inches='tight')
 plt.show()
