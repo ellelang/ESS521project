@@ -51,7 +51,7 @@ plt.xlabel('Clusters')
 plt.ylabel('Inertia')
 plt.grid(None)
 plt.savefig('maple29_Inertia.png',dpi = 300,bbox_inches='tight')
-
+plt.show()
 
 ######
 mapledata = pd.read_csv(data_folder/'output/wcmo_MAP.csv')

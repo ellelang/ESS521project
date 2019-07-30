@@ -14,10 +14,10 @@ from deap.benchmarks.tools import diversity, convergence, hypervolume
 from deap import creator
 from deap import tools
 
-plt.style.use('bmh')
+#plt.style.use('bmh')
 wcmodata_maple = pd.read_csv(data_folder/'output/wcmo_MAP.csv')
 wcmodata_maple.shape
-near_wld_maple0 = wcmodata_maple[['Site_ID','SedRed','Cost','NEAR_FID', 'NEAR_DIST','area_m2']].sort_values(by=['NEAR_FID','SedRed'])
+near_wld_maple0 = wcmodata_maple[['Site_ID','SedRed','Cost','NEAR_FID','NEAR_DIST','area_m2']].sort_values(by=['NEAR_FID','SedRed'])
 near_wld_maple0
 near_wld_maple0["Sedrank"] = near_wld_maple0.groupby("NEAR_FID")["SedRed"].rank("dense", ascending=False)
 near_wld_maple0["Sedrank"]
@@ -104,11 +104,13 @@ for t in range(len(top)):
 #near_wld_maple.to_csv(data_folder/'output/bcr_ranking_MAP.csv', index = False)
 
 ##save seeds
-seeds_array = np.array(near_wld_maple[topname])
-seeds_array
-seeds_array_to_list = seeds_array.tolist()
+seedslist = []
+for i in range(len(top)):
+    indexvalues = near_wld_maple.index[near_wld_maple[topname[i]] == 1].tolist()
+    seedslist.append(indexvalues)
+np.array(seedslist)
 json_file = "bcrseeds_maple.json" 
-json.dump(seeds_array_to_list, open(data_folder/json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
+json.dump(seedslist, open(data_folder/json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
 
 ############interaction 
 for i in range (len(top)):

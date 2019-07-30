@@ -11,7 +11,7 @@ maple29dataset.columns
 datarf = maple29dataset[['Site_ID','SedRed','Cost','area_m2','DA_9_SA_m2','NEAR_DIST',
                          'mean_slope','mean_D_m','mean_V_m3','CropProdIn']]
 
-datarf['bcr'] = maple29dataset.SedRed/maple29dataset.Cost
+datarf['bcr'] = (maple29dataset.SedRed/maple29dataset.Cost) 
 datarf.shape
 
 X = datarf.iloc[:, 3:10]
@@ -30,7 +30,7 @@ X_test = sc.transform(X_test)
 
 from sklearn.ensemble import RandomForestRegressor
 
-rf = RandomForestRegressor(n_estimators= 35, random_state=1)  
+rf = RandomForestRegressor(n_estimators= 100, random_state=1)  
 rf.fit(X_train, y_train)  
 y_pred = rf.predict(X_test)   
 
@@ -39,6 +39,8 @@ from sklearn import metrics
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
 print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))  
 print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred))) 
+
+
 
 importance_rf = pd.Series(rf.feature_importances_, index = X.columns)
 sorted_importance = importance_rf.sort_values()
@@ -49,7 +51,16 @@ plt.savefig('maple29rf.png',dpi = 300,bbox_inches='tight')
 
 plt.show()
 
-#####################wcmo
+
+plt.plot(y_test,'bo', label= 'y_test')
+plt.plot(y_pred,'ro', label = 'y_predict')
+plt.grid(None)
+plt.ylabel('Cost-effectivenss')
+plt.legend(loc='upper right')
+plt.savefig('maple29rf_ce.png',dpi = 300,bbox_inches='tight')
+
+
+#####################maples
 
 mapledataset = pd.read_csv(data_folder/'output/wcmo_MAP.csv')
 mapledatarf = mapledataset[['Site_ID','SedRed','Cost','area_m2','DA_9_SA_m2','NEAR_DIST',
@@ -69,11 +80,13 @@ maplerf = RandomForestRegressor(n_estimators= 150, random_state=1)
 maplerf.fit(X_train, y_train)  
 y_pred = maplerf.predict(X_test)   
 
-from sklearn import metrics
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
 print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))  
 print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred))) 
+
+
+
 
 maple_importance_rf = pd.Series(maplerf.feature_importances_, index = mapleX.columns)
 maple_sorted_importance = maple_importance_rf.sort_values()
@@ -83,5 +96,32 @@ plt.savefig('maplewholerf.png',dpi = 300,bbox_inches='tight')
 plt.grid(None)
 plt.show()
 
+
+
+plt.plot(y_test,'bo', label= 'y_test')
+plt.plot(y_pred,'ro', label = 'y_predict')
+plt.grid(None)
+plt.ylabel('Cost-effectivenss')
+plt.legend(loc='upper right')
+plt.savefig('maplewholerf_ce.png',dpi = 300,bbox_inches='tight')
+
 ###########
+
+wcmodataset = pd.read_csv(data_folder/'output/wcmogawhole.csv')
+wcmodatarf = wcmodataset[['Site_ID','SedRed','Cost','area_m2','DA_9_SA_m2','NEAR_DIST',
+                         'mean_slope','mean_D_m','mean_V_m3','CropProdIn']]
+
+wcmodatarf['bcr'] =wcmodatarf.SedRed/wcmodataset.Cost
+wcmodatarf.shape
+
+wcmoX = wcmodatarf.iloc[:, 3:10]
+wcmoX.columns
+wcmoy = wcmodatarf.iloc[:, 10]
+wcmoy
+X_train, X_test, y_train, y_test = train_test_split(
+        wcmoX.values, wcmoy.values, test_size=0.2, random_state=0) 
+
+wcmorf = RandomForestRegressor(n_estimators= 150, random_state=1)  
+wcmorf.fit(X_train, y_train)  
+y_pred = wcmorf.predict(X_test)
 
