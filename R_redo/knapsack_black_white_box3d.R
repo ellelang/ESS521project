@@ -35,7 +35,7 @@ fitness.fun = function(x) {
   if (weight > ks.limit)
     return(0) # penalty for limit violation
   #introduce simple epistasis
-  if(x[1] * x[3] * x[10] == 1) return(c(-10,-10,weight)) 
+  if(x[1] * x[3] * x[10] == 1) return(c(-10,-10,weight))
   else return (c(val1,val2,weight))
 }
 
@@ -47,7 +47,7 @@ fitness.fun = function(x) {
   if (weight > ks.limit)
     return(0) # penalty for limit violation
   #introduce simple epistasis
-  if(sum(x) == 5) return(c(val1,val2,weight)) 
+  if(sum(x) == 5) return(c(val1,val2,weight))
   else return (c(-10,-10,weight))
 }
 
@@ -78,18 +78,19 @@ control = registerECROperator(control, "selectForMating", selSimple)
 
 # initialize population of MU random bitstring
 population = genBin(MU, n.bits)
+population
 fitness = evaluateFitness(control, population)
-
+fitness
 
 # now do the evolutionary loop
 for (i in seq_len(MAX.ITER)) {
 
   offspring = recombinate(control, population, fitness = fitness, lambda = LAMBDA, p.recomb = 0.8)
- 
-  
+
+
 
   fitness.o = evaluateFitness(control, offspring)
-  
+
   # apply (MU + LAMBDA) selection
   sel = replaceMuPlusLambda(control, population, offspring, fitness, fitness.o)
   population = sel$population
@@ -101,7 +102,7 @@ print(population)
 #print(population[[which.max(fitness)]])
 print((fitness))
 
-#check the number of objects selected 
+#check the number of objects selected
 lapply(population,sum)
 
 FrontRes <- as.data.frame(t(fitness))
@@ -109,7 +110,7 @@ FrontRes <- as.data.frame(t(fitness))
 plot(FrontRes[,1],FrontRes[,2])
 
 Plot1 <- ggplot() +
-  
+
   geom_point(data = FrontRes, aes(x = FrontRes[,1], y = FrontRes[,2]),
              size = 2) + theme_minimal() +
   xlab(label = "First objective") +
@@ -132,6 +133,6 @@ res = ecr(fitness.fun, n.objectives = 3L, minimize = FALSE,
 print(res$pareto.front)
 print(res$pareto.set)
 
-#check the number of objects selected 
+#check the number of objects selected
 lapply(res$pareto.set,sum)
 
