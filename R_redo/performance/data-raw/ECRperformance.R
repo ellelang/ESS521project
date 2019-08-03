@@ -5,8 +5,8 @@ library(ecr)
 library(dplyr)
 library(ggplot2)
 data(mcMST)
-
-
+mcMST
+saveRDS(mcMST, "mcMST.rds")
 head(mcMST)
 obj.col <- c("f1", "f2")
 mcMST <- dplyr::filter(mcMST,

@@ -116,7 +116,7 @@ plt.legend(loc='upper left')
 plt.xlabel('Sed_Reduction')
 plt.ylabel('Cost')
 plt.grid(None)
-plt.savefig('bcrepis_mapleWHOLE.png',dpi = 300,bbox_inches='tight')
+#plt.savefig('bcrepis_mapleWHOLE.png',dpi = 300,bbox_inches='tight')
 plt.show()
 
 
@@ -220,7 +220,7 @@ toolbox.register("select", tools.selNSGA2)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def main():
-    NGEN = 5000
+    NGEN = 1000
     MU = 100
     LAMBDA = 100
     CXPB = 0.7
@@ -262,7 +262,7 @@ noseedsed_f = noseedfront[:,1]
 ##############bcr seeding
 
 def main():
-    NGEN = 5000
+    NGEN = 1000
     MU = 100
     LAMBDA = 100
     CXPB = 0.7
@@ -302,7 +302,7 @@ bcrseedsed_f = bcrseed_front[:,1]
 ############
 plt.scatter(noseedsed_f, noseedcost_f,c='y', marker='v', label='EA_noseed')
 plt.scatter(bcrseedsed_f, bcrseedcost_f, c='r', marker='s', label='EA_bcrseed')
-#plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
+plt.scatter(sedsum_ignore_epis, costsum_ignore_epis, c='b', marker='x', label='bcr_ignore_epistasis')
 plt.scatter(sedsum_epis,costsum_epis, c = 'c', marker = 'o', label='TruePF_epistasis')
 #plt.scatter(sed_noepis ,cost_noepis, c = 'm', marker = 'D', label='no_epistasis_bcr')
 plt.legend(loc='upper left')
@@ -312,6 +312,57 @@ plt.grid(None)
 plt.savefig('EAseeds_epistasis_mapleWHOLE.png', dpi=300)
 #plt.savefig('EAseeds_mapleWHOLE.png', dpi=300)
 plt.show()
+
+
+# Create the data.frame for performance evaluation NGEN = 500
+
+dic_EAseed = {'f1':bcrseedsed_f , 'f2':bcrseedcost_f.tolist()}
+df_EAseed = pd.DataFrame(dic_EAseed) 
+df_EAseed['prob'] = 'maple_whole'
+df_EAseed['repl'] = 1
+df_EAseed['algorithm'] = 'EA_bcrseeds'
+
+dic_noseed = {'f1':noseedsed_f , 'f2':noseedcost_f.tolist()}
+df_noseed = pd.DataFrame(dic_noseed) 
+df_noseed['prob'] = 'maple_whole'
+df_noseed['repl'] = 1
+df_noseed['algorithm'] = 'EA_noseeds'
+
+dic_bcr = {'f1':sedsum_ignore_epis, 'f2':costsum_ignore_epis}
+df_bcr = pd.DataFrame(dic_bcr) 
+df_bcr['prob'] = 'maple_whole'
+df_bcr['repl'] = 1
+df_bcr['algorithm'] = 'BCR_rank'
+
+df_algorithm = pd.concat([df_EAseed,df_noseed, df_bcr])
+df_algorithm
+df_algorithm.to_csv(data_folder/'output/maple_performance_500GEN.csv', index = False)
+
+
+
+# Create the data.frame for performance evaluation NGEN = 1000
+
+dic_EAseed = {'f1':bcrseedsed_f , 'f2':bcrseedcost_f.tolist()}
+df_EAseed = pd.DataFrame(dic_EAseed) 
+df_EAseed['prob'] = 'maple_whole'
+df_EAseed['repl'] = 2
+df_EAseed['algorithm'] = 'EA_bcrseeds'
+
+dic_noseed = {'f1':noseedsed_f , 'f2':noseedcost_f.tolist()}
+df_noseed = pd.DataFrame(dic_noseed) 
+df_noseed['prob'] = 'maple_whole'
+df_noseed['repl'] = 2
+df_noseed['algorithm'] = 'EA_noseeds'
+
+dic_bcr = {'f1':sedsum_ignore_epis, 'f2':costsum_ignore_epis}
+df_bcr = pd.DataFrame(dic_bcr) 
+df_bcr['prob'] = 'maple_whole'
+df_bcr['repl'] = 2
+df_bcr['algorithm'] = 'BCR_rank'
+
+df_algorithm = pd.concat([df_EAseed,df_noseed, df_bcr])
+df_algorithm
+df_algorithm.to_csv(data_folder/'output/maple_performance_1000GEN.csv', index = False)
 
 #############no interaction EA
 #
