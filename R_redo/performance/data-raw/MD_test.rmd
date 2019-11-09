@@ -1,0 +1,88 @@
+---
+title: "Performance_test"
+author: "Zhengxin Lang"
+date: "8/8/2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+## R Markdown
+
+
+```{r, echo=FALSE}
+rm(list = ls())
+library(ecr)
+library(dplyr)
+library(ggplot2)
+
+```
+
+
+```{r}
+setwd("C:/Users/langzx/Desktop/github/ESS521project/data")
+source("test.R")
+EA_rds <- readRDS("df_performace_0802.rds")
+head(EA_rds)
+# Normalize the Pareto-front, 
+obj.col <- c("f1", "f2")
+dat_normal <- ecr::normalize(EA_rds , obj.cols = obj.col, offset = 1)
+#head(dat_normal)
+```
+
+
+```{r}
+# Dominace Ranking
+ranks <- ecr::computeDominanceRanking(
+  dat_normal, obj.cols = obj.col
+)
+
+ecr:: plotDistribution (ranks) +
+ggplot2::theme( legend.position = "none")
+```
+
+```{r}
+ecr::plotScatter2d(
+  dplyr::filter(dat_normal, repl <= 2),
+  facet.type = "grid",
+  shape = "algorithm",
+  facet.args = list(facets = formula(repl ~ prob))) +
+  ggplot2::scale_color_grey(end = 0.8)
+```
+
+```{r}
+myONVG <- ecr::makeEMOAIndicator(
+  fun = function(points, ...) ncol(points),
+  name = "ONVG",
+  latex.name = "I_{0}",
+  minimize = FALSE
+)
+
+unary.inds <- list(
+  list(fun = ecr::emoaIndHV),
+  list(fun = ecr::emoaIndEps),
+  list(fun = myONVG)
+)
+
+inds <- ecr::computeIndicators(
+  dat_normal, unary.inds = unary.inds
+)
+
+head(inds$unary)
+
+```
+
+```{r}
+ecr::plotDistribution(inds$unary, plot.type = "boxplot")
+toLatex(inds$unary, stat.cols = c("HV", "EPS"))
+
+```
+```{r}
+unary <- inds$unary
+unary$algorithm <- gsub(
+  "EA_", "",
+  unary$algorithm, fixed = TRUE)
+head(unary)
+
+```
+
