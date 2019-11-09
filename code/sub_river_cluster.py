@@ -11,8 +11,9 @@ import numpy as np
 from sklearn.cluster import KMeans
 SBIO = pd.read_csv(data_folder/'csv/SB IO Detail.csv')
 SBIO.columns
-wcmoga = pd.read_csv(data_folder/'csv/wcmoga.csv')
+wcmoga = pd.read_csv(data_folder/'csv/WCMOga.csv')
 wcmoga.columns
+
 wcmodata = pd.read_csv(data_folder/'csv/WCMO.csv')
 wcmodata.columns
 wcmosub = pd.merge(left = wcmodata, right = SBIO, left_on = 'HYDSB_LES30SB', right_on = 'SUBID', how = 'left')
@@ -21,6 +22,13 @@ wcmoga_merge = pd.merge(left = wcmoga, right = wcmosub, left_on = 'ID', right_on
 wcmoga_merge.columns
 #wcmoga_merge = wcmoga_merge.drop(['Type','HYDSB', 'SEDSB', 'SEDSB_R', ], axis=1)
 wcmoga_merge.to_csv('wcmogawhole.csv', index = False)
+
+ncmoga = pd.read_csv(data_folder/'csv/ICMOga.csv')
+ncmoga.columns
+ncmodata = pd.read_csv(data_folder/'csv/ICMO.csv')
+ncmodata.columns
+
+
 
 def River_sub (data, river_col, river_id):
     wcmo_riversub = data[data[river_col] == river_id]
