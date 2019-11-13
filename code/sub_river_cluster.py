@@ -23,12 +23,14 @@ wcmoga_merge.columns
 #wcmoga_merge = wcmoga_merge.drop(['Type','HYDSB', 'SEDSB', 'SEDSB_R', ], axis=1)
 wcmoga_merge.to_csv('wcmogawhole.csv', index = False)
 
-ncmoga = pd.read_csv(data_folder/'csv/ICMOga.csv')
-ncmoga.columns
-ncmodata = pd.read_csv(data_folder/'csv/ICMO.csv')
-ncmodata.columns
+icmoga = pd.read_csv(data_folder/'csv/ICMOga.csv')
+icmoga.columns
+icmodata = pd.read_csv(data_folder/'csv/ICMO.csv')
+icmodata.columns
 
-
+icmoga_merge = pd.merge(left = icmoga, right = icmodata, left_on = 'ID', right_on = 'ID')
+icmoga_merge.columns
+icmoga_merge.to_csv(data_folder/'icmogawhole.csv', index = False)
 
 def River_sub (data, river_col, river_id):
     wcmo_riversub = data[data[river_col] == river_id]
